@@ -8,10 +8,10 @@ app.use(bodyParser.text());
 
 app.post('/domains', function(req, res){
 
-	var text = req.body;
+	var text = req.body.replace(' ', '');
 	getDomainInfoArray().then(function(result) {
 		getDomainHackList(text.toString(), result).then(function(domainHackList) {
-			res.send(domainHackList.toString())
+			res.send(JSON.stringify(domainHackList))
 		})
 	})
 
@@ -31,15 +31,7 @@ function getDomainInfoArray() {
 						var secondColumnTextIsEntity = $(elem).find('th').eq(1).text() == 'Entity';
 						$(elem).find('tbody').find('tr').each(function(i, elem) {
 							if ($(elem).find('td').first().text().length > 0) {
-								var newDomain = {
-									name: $(elem).find('td').first().text(),
-									type: {
-										text: $(elem).find('td').eq(1).text(),
-										flagIcon: secondColumnTextIsEntity ? $(elem).find('td').eq(1).find('.flagicon').find('img').attr('src') : ''
-									},
-									notes: $(elem).find('td').eq(secondColumnTextIsEntity ? 3 : 2).text()
-								};
-								domains.push(newDomain);
+								domains.push(getDomain($(elem), secondColumnTextIsEntity));
 							}
 						})
 					}
@@ -56,7 +48,7 @@ function getDomainHackList(text, domainInfoList) {
 	return new Promise(function(resolve, reject) {
 		var domainHackList = [];
 		var matchingDomains = domainInfoList.filter(function(elem) {
-			return text.toLowerCase().replace(/[\W_]+/g, ' ').indexOf(elem.name.replace('.', '')) > 0
+			return text.toLowerCase().replace(/[\W_]+/g, '').indexOf(elem.name.replace('.', '')) > 0
 		})
 		matchingDomains.forEach(function(domain) {
 			var indexOfDomain = text.indexOf(domain.name.replace('.', ''));
@@ -65,11 +57,18 @@ function getDomainHackList(text, domainInfoList) {
 			if (indexOfDomain + domain.name.length <= text.length) {
 				hackedDomain = hackedDomain.slice(0, indexOfDomain + domain.name.length) + '/' + hackedDomain.slice(indexOfDomain + domain.name.length);
 			}
-			domainHackList.push(hackedDomain);
+			domainHackList.push({
+				name: hackedDomain,
+				type: {
+					text: domain.type.text,
+					flagIcon: domain.type.flagIcon
+				},
+				notes: domain.notes
+			});
 		})
 		domainHackList.sort(function(a, b) {
-			var paramA = getComparisonParameter(a);
-			var paramB = getComparisonParameter(b);
+			var paramA = getComparisonParameter(a.name);
+			var paramB = getComparisonParameter(b.name);
 			return (paramA < paramB) ? -1 : (paramA > paramB ? 1 : 0);
 		})
 		resolve(domainHackList);
@@ -78,6 +77,17 @@ function getDomainHackList(text, domainInfoList) {
 
 function getComparisonParameter(string) {
 	return string.indexOf('/') < 0 ? 0 : string.length - string.indexOf('/');
+}
+
+function getDomain(elem, flag) {
+	return newDomain = {
+		name: elem.find('td').first().text(),
+		type: {
+			text: elem.find('td').eq(1).text(),
+			flagIcon: flag ? elem.find('td').eq(1).find('.flagicon').find('img').attr('src') : ''
+		},
+		notes: elem.find('td').eq(flag ? 3 : 2).text()
+	};
 }
 
 app.listen('3000')
