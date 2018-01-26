@@ -1,6 +1,6 @@
 ## Domain Hack generating project
 
-#How to launch:
+How to launch:
 1. Clone https://github.com/nicoletailiuha/domain-hack.git
 2. cd domain-hack
 3. npm install

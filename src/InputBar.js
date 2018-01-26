@@ -22,7 +22,7 @@ class InputBar extends Component {
 				if (self.state.domainText.length > 0) {
 					self.props.requestForDomainHacks(self.state.domainText);
 				}
-			}, 1000)
+			}, 500)
 		});
 	}
 

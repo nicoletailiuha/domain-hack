@@ -10,8 +10,10 @@ app.use(cors());
 
 app.post('/domains', function(req, res){
 
-	var text = req.body.replace(/ /g, '').toLowerCase();
-	getDomainInfoArray().then(function(result) {
+	var text = req.body.replace(/[^A-Za-z0-9]/g, '').toLowerCase();
+	getDomainInfoArray().catch(function(error) {
+		console.log(error);
+	}).then(function(result) {
 		getDomainHackList(text.toString(), result).then(function(domainHackList) {
 			res.send(JSON.stringify(domainHackList))
 		})
@@ -50,7 +52,7 @@ function getDomainHackList(text, domainInfoList) {
 	return new Promise(function(resolve, reject) {
 		var domainHackList = [];
 		var matchingDomains = domainInfoList.filter(function(elem) {
-			return text.replace(/[\W_]+/g, '').indexOf(elem.name.replace('.', '')) > 0
+			return text.indexOf(elem.name.replace('.', '')) > 0
 		})
 		matchingDomains.forEach(function(domain) {
 			var indexOfDomain = text.indexOf(domain.name.replace('.', ''));
