@@ -1,28 +1,36 @@
-.App {
+.table {
+  table-layout: fixed; 
+  width: 60%;
+  margin-left: 20%;
+}
+
+th {
+  height: 35px;
+  background-color: #191919;
+  color: #FDF3E7;
+}
+
+td {
+  padding: 15px;
+  word-wrap:break-word;
+  background-color: #DFE2DB;
+  color: #191919;
+}
+
+.centered-td {
   text-align: center;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+.header-text, .no-domain {
+  text-align: center;
+  font-size: 25px;
+  font-weight: bold;
 }
 
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
+.domain-name {
+  font-weight: bold
 }
 
-.App-title {
-  font-size: 1.5em;
-}
-
-.App-intro {
-  font-size: large;
-}
-
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+table {
+  margin-bottom: 20px;
 }

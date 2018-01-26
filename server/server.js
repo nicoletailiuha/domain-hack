@@ -83,13 +83,17 @@ function getComparisonParameter(string) {
 
 function getDomain(elem, flag) {
 	return newDomain = {
-		name: elem.find('td').first().text(),
+		name: removeCitations(elem.find('td').first().text()),
 		type: {
-			text: elem.find('td').eq(1).text(),
+			text: removeCitations(elem.find('td').eq(1).text()),
 			flagIcon: flag ? elem.find('td').eq(1).find('.flagicon').find('img').attr('src') : ''
 		},
-		notes: elem.find('td').eq(flag ? 3 : 2).text()
+		notes: removeCitations(elem.find('td').eq(flag ? 3 : 2).text())
 	};
+}
+
+function removeCitations(text) {
+	return text.replace(/\[.*\]/, '')
 }
 
 app.listen('8080')

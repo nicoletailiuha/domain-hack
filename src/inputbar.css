@@ -1,0 +1,9 @@
+.bar {
+	width: 40%;
+	margin-left: 30%;
+	font-size: 25px;
+	padding-left:10px;
+	margin-bottom: 35px;
+	border-radius: 5px;
+	box-shadow: none;
+}

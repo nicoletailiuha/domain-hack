@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import './inputbar.css';
 
 class InputBar extends Component {
 	constructor() {
@@ -18,7 +19,9 @@ class InputBar extends Component {
 			domainText: event.target.value,
 			typing: false,
 			typingTimeout: setTimeout(function () {
-				self.props.requestForDomainHacks(self.state.domainText);
+				if (self.state.domainText.length > 0) {
+					self.props.requestForDomainHacks(self.state.domainText);
+				}
 			}, 1000)
 		});
 	}
@@ -26,7 +29,9 @@ class InputBar extends Component {
 	render() {
 		return (
 			<div>
-			<input type="text" value={this.state.domainText} onChange={this.handleChange}/>
+				<input type="text" className="bar" placeholder="domain name goes here"
+						value={this.state.domainText} 
+						onChange={this.handleChange}/>
 			</div>
 			)
 	}
