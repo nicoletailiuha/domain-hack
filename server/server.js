@@ -3,12 +3,14 @@ var bodyParser = require("body-parser");
 var request = require('request');
 var cheerio = require('cheerio');
 var app     = express();
+var cors = require('cors');
 
 app.use(bodyParser.text());
+app.use(cors());
 
 app.post('/domains', function(req, res){
 
-	var text = req.body.replace(' ', '');
+	var text = req.body.replace(/ /g, '').toLowerCase();
 	getDomainInfoArray().then(function(result) {
 		getDomainHackList(text.toString(), result).then(function(domainHackList) {
 			res.send(JSON.stringify(domainHackList))
@@ -48,7 +50,7 @@ function getDomainHackList(text, domainInfoList) {
 	return new Promise(function(resolve, reject) {
 		var domainHackList = [];
 		var matchingDomains = domainInfoList.filter(function(elem) {
-			return text.toLowerCase().replace(/[\W_]+/g, '').indexOf(elem.name.replace('.', '')) > 0
+			return text.replace(/[\W_]+/g, '').indexOf(elem.name.replace('.', '')) > 0
 		})
 		matchingDomains.forEach(function(domain) {
 			var indexOfDomain = text.indexOf(domain.name.replace('.', ''));
@@ -90,5 +92,5 @@ function getDomain(elem, flag) {
 	};
 }
 
-app.listen('3000')
+app.listen('8080')
 exports = module.exports = app;
