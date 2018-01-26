@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import InputBar from './InputBar'
-import DomainHacksList from './DomainHacksList'
 import 'whatwg-fetch';
 
 class App extends Component {
 
   constructor() {
     super();
-    this.domainHacks = [];
+    this.state = {domainHacks : []};
+    this.requestForDomainHacks = this.requestForDomainHacks.bind(this);
   }
 
   requestForDomainHacks = (domainText) => {
@@ -21,15 +21,25 @@ class App extends Component {
     }).then(function(data) {
       return data.json()
     }).then(function(data) {
-      self.domainHacks = Object.values(data);
+      self.setState({domainHacks: Object.values(data)})
     })
   };
 
   render() {
+    var listItems = this.state.domainHacks.map(function(item) {
+      return (
+        <li key={item.name}> 
+          {item.name}
+        </li> 
+      ); 
+    }); 
+
     return (
       <div>
-      <InputBar requestForDomainHacks={this.requestForDomainHacks}/>
-      <DomainHacksList/>
+        <InputBar requestForDomainHacks={this.requestForDomainHacks}/>
+        <ul>
+          {listItems} 
+        </ul>
       </div>
       );
   }

@@ -19,7 +19,7 @@ class InputBar extends Component {
 			typing: false,
 			typingTimeout: setTimeout(function () {
 				self.props.requestForDomainHacks(self.state.domainText);
-			}, 500)
+			}, 1000)
 		});
 	}
 
