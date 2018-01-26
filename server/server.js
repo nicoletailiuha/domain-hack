@@ -11,9 +11,7 @@ app.use(cors());
 app.post('/domains', function(req, res){
 
 	var text = req.body.replace(/[^A-Za-z0-9]/g, '').toLowerCase();
-	getDomainInfoArray().catch(function(error) {
-		console.log(error);
-	}).then(function(result) {
+	getDomainInfoArray().then(function(result) {
 		getDomainHackList(text.toString(), result).then(function(domainHackList) {
 			res.send(JSON.stringify(domainHackList))
 		})
@@ -21,6 +19,7 @@ app.post('/domains', function(req, res){
 
 })
 
+//parsing the Wikipedia list for info
 function getDomainInfoArray() {
 	var url = 'https://en.wikipedia.org/wiki/List_of_Internet_top-level_domains';
 
@@ -31,7 +30,11 @@ function getDomainInfoArray() {
 				var $ = cheerio.load(html);
 
 				$('.wikitable').each(function(i, elem) {
+					//only the tables in which the first column has 'Name' header
+					//contain needed information
 					if ($(elem).find('th').first().text() == 'Name') {
+						//if the second table column contains the 'Entity' header then
+						//the additional info column is the fourth, otherwise - the third
 						var secondColumnTextIsEntity = $(elem).find('th').eq(1).text() == 'Entity';
 						$(elem).find('tbody').find('tr').each(function(i, elem) {
 							if ($(elem).find('td').first().text().length > 0) {
@@ -48,16 +51,30 @@ function getDomainInfoArray() {
 	});
 }
 
+function getDomain(elem, flag) {
+	return newDomain = {
+		name: removeCitations(elem.find('td').first().text()),
+		type: {
+			text: removeCitations(elem.find('td').eq(1).text()),
+			flagIcon: flag ? elem.find('td').eq(1).find('.flagicon').find('img').attr('src') : ''
+		},
+		notes: removeCitations(elem.find('td').eq(flag ? 3 : 2).text())
+	};
+}
+
 function getDomainHackList(text, domainInfoList) {
 	return new Promise(function(resolve, reject) {
 		var domainHackList = [];
+		//find list of domains contained in the requested text
 		var matchingDomains = domainInfoList.filter(function(elem) {
 			return text.indexOf(elem.name.replace('.', '')) > 0
 		})
 		matchingDomains.forEach(function(domain) {
 			var indexOfDomain = text.indexOf(domain.name.replace('.', ''));
+			//add dot before the domain name
 			var hackedDomain = text.slice(0, indexOfDomain) + '.' + text.slice(indexOfDomain);
 
+			//add slash after the domain name
 			if (indexOfDomain + domain.name.length <= text.length) {
 				hackedDomain = hackedDomain.slice(0, indexOfDomain + domain.name.length) + '/' + hackedDomain.slice(indexOfDomain + domain.name.length);
 			}
@@ -70,6 +87,7 @@ function getDomainHackList(text, domainInfoList) {
 				notes: domain.notes
 			});
 		})
+		//sorting domains by the lowest number of elements after slash
 		domainHackList.sort(function(a, b) {
 			var paramA = getComparisonParameter(a.name);
 			var paramB = getComparisonParameter(b.name);
@@ -81,17 +99,6 @@ function getDomainHackList(text, domainInfoList) {
 
 function getComparisonParameter(string) {
 	return string.indexOf('/') < 0 ? 0 : string.length - string.indexOf('/');
-}
-
-function getDomain(elem, flag) {
-	return newDomain = {
-		name: removeCitations(elem.find('td').first().text()),
-		type: {
-			text: removeCitations(elem.find('td').eq(1).text()),
-			flagIcon: flag ? elem.find('td').eq(1).find('.flagicon').find('img').attr('src') : ''
-		},
-		notes: removeCitations(elem.find('td').eq(flag ? 3 : 2).text())
-	};
 }
 
 function removeCitations(text) {

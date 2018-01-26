@@ -11,6 +11,7 @@ class InputBar extends Component {
 	handleChange = (event) =>{ 
 		const self = this;
 
+		//wait 1.5 second after input then send request
 		if (self.state.typingTimeout) {
 			clearTimeout(self.state.typingTimeout);
 		}
@@ -22,7 +23,7 @@ class InputBar extends Component {
 				if (self.state.domainText.length > 0) {
 					self.props.requestForDomainHacks(self.state.domainText);
 				}
-			}, 500)
+			}, 1500)
 		});
 	}
 
